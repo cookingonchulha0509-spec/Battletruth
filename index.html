@@ -2,268 +2,721 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Battletruth &mdash; Important Update</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Battletruth AI Support</title>
     
-    <!-- Premium System Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --bg-main: #ffffff;
+            --bg-dark: #090e17;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
         }
 
-        body {
-            background-color: #F8FAFC; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* 100dvh for proper zero-scroll fit on all mobile screens */
-            height: 100dvh;
-            overflow: hidden; 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing: antialiased; }
+        
+        body { 
+            background-color: #cbd5e1;
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden; color: var(--text-main); 
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
-        /* App Container Layout (Zero Scroll) */
-        .app-container {
-            width: 100%;
-            max-width: 440px;
-            height: 100%;
-            background-color: #EBF4FF; /* Half Blue Top */
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        .app-container { 
+            width: 100%; max-width: 440px; height: 100%; 
+            background-color: var(--bg-main); position: relative; 
+            overflow: hidden; display: flex; flex-direction: column; 
         }
 
-        /* Desktop border-radius optimization */
-        @media (min-height: 800px) and (min-width: 450px) {
-            .app-container {
-                height: 90vh;
-                border-radius: 20px;
+        @media (min-width: 480px) {
+            .app-container { 
+                height: 90vh; border-radius: 32px; 
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 8px #ffffff; 
             }
         }
+        
+        .screen { 
+            position: absolute; inset: 0; display: flex; flex-direction: column; 
+            opacity: 0; pointer-events: none; 
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease; 
+            background-color: var(--bg-main); z-index: 1; 
+        }
+        
+        .screen.active { opacity: 1; pointer-events: all; transform: translateX(0); z-index: 2; }
+        .screen.slide-out-left { transform: translateX(-30%); opacity: 0; }
+        .screen.waiting-right { transform: translateX(100%); }
 
-        /* --- HERO SECTION --- */
-        .hero-section {
-            padding: 35px 20px 25px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            flex-shrink: 0;
+        /* EMAIL SCREEN */
+        #screen-email { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); padding: 40px 24px; justify-content: center; text-align: center; }
+        
+        .header-icon { 
+            width: 84px; height: 84px; 
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe); 
+            border-radius: 24px; display: flex; align-items: center; justify-content: center; 
+            margin: 0 auto 32px; font-size: 36px; color: var(--primary); 
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.15); 
+            transform: rotate(-5deg); animation: floatIcon 4s ease-in-out infinite; 
+        }
+        @keyframes floatIcon { 
+            0%, 100% { transform: translateY(0) rotate(-5deg); } 
+            50% { transform: translateY(-12px) rotate(-5deg); } 
+        }
+        
+        .info-box {
+            background: var(--primary-light); border: 1px solid #dbeafe; 
+            padding: 14px 18px; border-radius: 16px; display: flex; gap: 12px; 
+            align-items: flex-start; margin-bottom: 32px; text-align: left;
+        }
+        .info-box i { color: var(--primary); margin-top: 2px; font-size: 16px; }
+        .info-box p { color: #1e3a8a; font-size: 13.5px; font-weight: 600; line-height: 1.5; margin: 0; }
+        
+        .input-box { 
+            width: 100%; padding: 18px; font-size: 15px; 
+            background: #f1f5f9; border: 2px solid transparent; 
+            border-radius: 16px; transition: all 0.3s ease; 
+            font-weight: 500; color: var(--text-main); margin-bottom: 24px;
+        }
+        .input-box::placeholder { color: #94a3b8; font-weight: 400; }
+        .input-box:focus { 
+            background: #ffffff; border-color: var(--primary); 
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); 
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: #fff; font-size: 16px; font-weight: 700; padding: 18px; 
+            border-radius: 16px; width: 100%; border: none; cursor: pointer; 
+            transition: all 0.2s ease; display: flex; align-items: center; 
+            justify-content: center; gap: 12px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25); 
+        }
+        .btn-primary:active { transform: translateY(2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+
+        /* CALL DIALER SCREEN */
+        #screen-call { background: radial-gradient(circle at 50% 20%, #1e293b 0%, var(--bg-dark) 100%); color: #f8fafc; padding: 50px 24px 40px; align-items: center; }
+        
+        .secure-badge { 
+            font-size: 12px; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.1); 
+            padding: 6px 14px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; 
+            margin-bottom: 40px; border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        
+        .avatar-container { position: relative; margin-bottom: 24px; }
+        .agent-avatar { 
+            width: 110px; height: 110px; border-radius: 50%; 
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 44px; color: white; position: relative; z-index: 2; 
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4); border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .pulse-ring { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 110px; height: 110px; border-radius: 50%; border: 2px solid #3b82f6; 
+            z-index: 1; opacity: 0; 
+        }
+        .speaking .pulse-ring { animation: radarPulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1); }
+        .speaking .pulse-ring.delay { animation-delay: 1s; }
+        @keyframes radarPulse { 
+            0% { width: 110px; height: 110px; opacity: 1; border-width: 2px; } 
+            100% { width: 280px; height: 280px; opacity: 0; border-width: 1px; } 
         }
 
-        /* Professional 🚫 Icon Circle */
-        .icon-circle {
-            width: 76px;
-            height: 76px;
-            background-color: #FFFFFF;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 16px;
-            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.12);
-            border: 4px solid #D1E5FF;
+        .call-status { color: #60a5fa; font-size: 14px; margin-bottom: 40px; font-weight: 600; letter-spacing: 0.5px; animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        
+        .dialpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; max-width: 280px; margin-top: auto; margin-bottom: 40px; }
+        .dial-btn { 
+            width: 72px; height: 72px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); 
+            color: #ffffff; font-size: 28px; font-weight: 300; display: flex; 
+            align-items: center; justify-content: center; margin: 0 auto; cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
         }
-
-        .icon-circle svg {
-            width: 36px;
-            height: 36px;
-            color: #1E293B; /* Professional Dark Slate Color */
+        .dial-btn:active { background: #3b82f6; border-color: #3b82f6; transform: scale(0.9); font-weight: 500; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        
+        .end-call-btn { 
+            background: var(--danger); color: white; width: 72px; height: 72px; 
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            font-size: 26px; cursor: pointer; border: none; 
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); margin-bottom: 10px; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); transform: rotate(135deg); 
         }
+        .end-call-btn:active { transform: scale(0.9) rotate(135deg); }
 
-        .hero-title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #0F172A;
-            margin-bottom: 8px;
+        /* OTHER ISSUE SCREEN */
+        #screen-other { background: #f8fafc; }
+        .screen-header { display: flex; align-items: center; gap: 16px; padding: 32px 24px 24px; background: transparent; }
+        .icon-btn { background: transparent; border: none; font-size: 22px; color: var(--text-main); cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; margin-left: -8px; }
+        .icon-btn:active { background: #e2e8f0; }
+        .screen-body { padding: 0 24px 24px; display: flex; flex-direction: column; flex: 1; }
+        
+        textarea { 
+            width: 100%; height: 200px; border: 2px solid #e2e8f0; border-radius: 16px; 
+            padding: 20px; font-size: 15px; resize: none; background: #ffffff; 
+            font-weight: 500; color: var(--text-main); transition: all 0.3s; margin-bottom: 24px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
+        textarea::placeholder { color: #94a3b8; font-weight: 400; }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); }
 
-        .hero-subtitle {
-            font-size: 14px;
-            font-weight: 600;
-            color: #DC2626; /* Warning Red */
-            background: #FEE2E2;
-            padding: 6px 14px;
-            border-radius: 99px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        /* SUCCESS SCREEN */
+        #screen-success { justify-content: center; align-items: center; text-align: center; background: #ffffff; padding: 32px; }
+        .success-circle { 
+            width: 88px; height: 88px; background-color: var(--success); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; color: white; 
+            font-size: 40px; margin-bottom: 28px; animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            box-shadow: 0 16px 32px rgba(16, 185, 129, 0.25); 
         }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        
+        .loader-dots { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .loader-dots div { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .loader-dots div:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dots div:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        .hero-subtitle svg {
-            width: 16px;
-            height: 16px;
+        /* Global Toast */
+        #toast { 
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%) scale(0.9); 
+            background: rgba(15, 23, 42, 0.95); color: white; padding: 14px 28px; 
+            border-radius: 100px; font-weight: 600; font-size: 14px; opacity: 0; 
+            pointer-events: none; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: max-content; 
+            max-width: 90%; text-align: center; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
         }
-
-        /* --- BOTTOM SHEET --- */
-        .bottom-sheet {
-            background-color: #FFFFFF;
-            flex-grow: 1;
-            border-radius: 32px 32px 0 0;
-            padding: 28px 24px 24px 24px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 -10px 40px rgba(37, 99, 235, 0.05);
-        }
-
-        .content-heading {
-            font-size: 19px;
-            font-weight: 800;
-            color: #0F172A;
-            margin-bottom: 10px;
-            letter-spacing: -0.3px;
-            line-height: 1.3;
-        }
-
-        .content-text {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #475569;
-            margin-bottom: 18px;
-        }
-
-        /* Panic Handle Trust Box */
-        .trust-box {
-            background-color: #F8FAFC;
-            padding: 14px 16px;
-            border-left: 4px solid #03A685; /* Success Green */
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 20px;
-        }
-
-        .live-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #065F46;
-        }
-
-        /* Animated Live Support Dot */
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10B981;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .pulse-dot::after {
-            content: '';
-            position: absolute;
-            top: -3px; left: -3px; right: -3px; bottom: -3px;
-            background-color: #10B981;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite ease-out;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
-
-        .trust-box-text {
-            font-size: 13px;
-            font-weight: 500;
-            color: #334155;
-            line-height: 1.4;
-        }
-
-        /* --- THE "TAGDA" BUTTON --- */
-        .tagda-blue-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background-color: #2563EB; 
-            color: #FFFFFF;
-            font-size: 16px;
-            font-weight: 700;
-            padding: 16px;
-            border-radius: 14px;
-            width: 100%;
-            border: none;
-            text-decoration: none;
-            /* margin-top: auto pushes it to the bottom */
-            margin-top: auto; 
-            cursor: pointer;
-            box-shadow: 0 6px 0 #1D4ED8, 0 10px 20px rgba(37, 99, 235, 0.25);
-            transition: all 0.1s ease;
-        }
-
-        .tagda-blue-btn:active {
-            transform: translateY(6px); 
-            box-shadow: 0 0 0 #1D4ED8, 0 4px 10px rgba(37, 99, 235, 0.25);
-        }
-
-        .tagda-blue-btn svg { width: 20px; height: 20px; }
-
+        #toast.show { opacity: 1; top: 32px; transform: translateX(-50%) scale(1); }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        
-        <!-- --- Top Hero Section --- -->
-        <div class="hero-section">
-            <div class="icon-circle">
-                <!-- Professional 🚫 (Prohibited/Closed) SVG Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
+        <div id="toast">Error Message</div>
+
+        <div id="screen-email" class="screen active">
+            <div class="header-icon"><i class="fa-solid fa-headset"></i></div>
+            <h1 style="font-size: 28px; color: var(--text-main); font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px;">Support Center</h1>
+            <p style="color: var(--text-muted); font-size: 15px; font-weight: 500; margin-bottom: 32px;">The app has been permanently closed.</p>
+            
+            <div class="info-box">
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>Enter your email to securely connect with our AI for Refunds & Settlements.</p>
             </div>
-            <h1 class="hero-title">Battletruth Update</h1>
-            <div class="hero-subtitle">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
-                </svg>
-                App Permanently Closed
+            
+            <input type="email" id="userEmail" class="input-box" placeholder="Registered Email Address" required autocomplete="off">
+            
+            <button class="btn-primary" onclick="initiateCall()">
+                <i class="fa-solid fa-phone-volume"></i> Connect to AI Agent
+            </button>
+        </div>
+
+        <div id="screen-call" class="screen waiting-right">
+            <span class="secure-badge"><i class="fa-solid fa-lock"></i> E2E Encrypted</span>
+            
+            <div class="avatar-container">
+                <div class="pulse-ring" id="agent-pulse"></div>
+                <div class="pulse-ring delay"></div>
+                <div class="agent-avatar"><i class="fa-solid fa-robot"></i></div>
+            </div>
+            
+            <h3 style="font-size: 22px; margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">Battletruth AI</h3>
+            <div class="call-status" id="callStatusText">Ringing...</div>
+
+            <div class="dialpad">
+                <div class="dial-btn" onclick="handleKeypad('1')">1</div>
+                <div class="dial-btn" onclick="handleKeypad('2')">2</div>
+                <div class="dial-btn" onclick="handleKeypad('3')">3</div>
+                <div class="dial-btn" onclick="handleKeypad('4')">4</div>
+                <div class="dial-btn" onclick="handleKeypad('5')">5</div>
+                <div class="dial-btn" onclick="handleKeypad('6')">6</div>
+                <div class="dial-btn" onclick="handleKeypad('7')">7</div>
+                <div class="dial-btn" onclick="handleKeypad('8')">8</div>
+                <div class="dial-btn" onclick="handleKeypad('9')">9</div>
+                <div></div>
+                <div class="dial-btn" onclick="handleKeypad('0')">0</div>
+                <div></div>
+            </div>
+
+            <button class="end-call-btn" onclick="endCall(true)"><i class="fa-solid fa-phone"></i></button>
+        </div>
+
+        <div id="screen-other" class="screen waiting-right">
+            <div class="screen-header">
+                <button class="icon-btn" onclick="endCall(true)"><i class="fa-solid fa-arrow-left"></i></button>
+                <span style="font-size: 18px; font-weight: 700; color: var(--text-main);">Submit Issue</span>
+            </div>
+            <div class="screen-body">
+                <h2 style="font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; letter-spacing: -0.5px;">Write your issue</h2>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; font-weight: 500;">Please describe your problem in detail. We will connect you to our Support Team on WhatsApp.</p>
+                <textarea id="customIssueText" placeholder="Explain what went wrong..."></textarea>
+                <button class="btn-primary" onclick="submitOtherIssue()">Submit & Chat <i class="fa-solid fa-paper-plane" style="margin-left: 4px;"></i></button>
             </div>
         </div>
 
-        <!-- --- Bottom Sheet --- -->
-        <div class="bottom-sheet">
-            <h2 class="content-heading">Please don't panic. Your funds are 100% safe.</h2>
-            
-            <p class="content-text">
-                We understand that the app closing might worry you. However, your account data, pending withdrawals, and refund details are completely secure with us.
-            </p>
-            
-            <div class="trust-box">
-                <div class="live-status">
-                    <span class="pulse-dot"></span>
-                    Customer Support is LIVE
-                </div>
-                <div class="trust-box-text">
-                    Our dedicated team is actively sitting right now to manually clear all your pending settlements.
-                </div>
+        <div id="screen-success" class="screen waiting-right">
+            <div class="success-circle"><i class="fa-solid fa-check"></i></div>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; letter-spacing: -0.5px;">Connecting...</h1>
+            <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 32px; font-weight: 500;">Routing your details securely to WhatsApp.</p>
+            <div class="loader-dots">
+                <div></div><div></div><div></div>
             </div>
-
-            <!-- TAGDA BUTTON -->
-            <a href="https://battletruth.site/support.html" class="tagda-blue-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z" />
-                </svg>
-                Connect Live Support
-            </a>
         </div>
-        
+
     </div>
 
+    <!-- BACKGROUND RINGTONE -->
+    <audio id="ringtone" loop preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- FIREBASE SDK & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBElxrl7movpnFOxaUjWqrqBGhWVkaS3jw",
+            authDomain: "riser-tournament.firebaseapp.com",
+            databaseURL: "https://riser-tournament-default-rtdb.firebaseio.com",
+            projectId: "riser-tournament",
+            storageBucket: "riser-tournament.firebasestorage.app",
+            messagingSenderId: "742332204527",
+            appId: "1:742332204527:web:f0f0f939c5a78776fa621a"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const SUPPORT_NUMBER = "918860204675";
+        let userData = null;
+        let accountUid = "";
+        let depositInfo = { count: 0, total: 0 };
+        let currentState = "INIT";
+        let inactivityTimer = null;
+        let isInterrupting = false;
+        let currentUtterance = null;
+        let requestIntent = "Refund / Settlement";
+        let currentLang = 'hi-IN'; // Default Language for Bilingual Logic
+
+        const ui = {
+            email: document.getElementById("screen-email"),
+            call: document.getElementById("screen-call"),
+            other: document.getElementById("screen-other"),
+            success: document.getElementById("screen-success"),
+            statusText: document.getElementById("callStatusText"),
+            ringtone: document.getElementById("ringtone"),
+            pulse: document.getElementById("agent-pulse")
+        };
+
+        window.initiateCall = initiateCall;
+        window.handleKeypad = handleKeypad;
+        window.endCall = endCall;
+        window.submitOtherIssue = submitOtherIssue;
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 4000);
+        }
+
+        function switchScreen(from, to) {
+            from.classList.remove("active");
+            from.classList.add("slide-out-left");
+            to.classList.remove("waiting-right", "slide-out-left");
+            to.classList.add("active");
+        }
+
+        function stopRingtone() {
+            ui.ringtone.pause();
+            try { ui.ringtone.currentTime = 0; } catch (_) {}
+        }
+
+        function isSuccessfulDeposit(tx) {
+            if (!tx || String(tx.type || "").toLowerCase() !== "up") return false;
+            return String(tx.note || "").trim().toLowerCase() === "deposit success"
+                && Number(tx.amount || 0) > 0;
+        }
+
+        // 100% UNTOUCHED ORIGINAL DATA FETCHING LOGIC
+        async function loadAccountData(email) {
+            const usersRef = query(ref(db, "users"), orderByChild("email"), equalTo(email));
+            const snapshot = await get(usersRef);
+            if (!snapshot.exists()) throw new Error("यह email Battletruth account में register नहीं है।");
+
+            let found = null;
+            snapshot.forEach(child => {
+                found = { key: child.key, data: child.val() || {} };
+            });
+            if (!found) throw new Error("Account details नहीं मिल सके।");
+
+            accountUid = String(found.data.uid || found.key);
+            userData = { ...found.data, uid: accountUid };
+
+            depositInfo = { count: 0, total: 0 };
+            const walletSnap = await get(ref(db, `walletHistory/${accountUid}`));
+            if (walletSnap.exists()) {
+                walletSnap.forEach(txSnap => {
+                    const tx = txSnap.val();
+                    if (isSuccessfulDeposit(tx)) {
+                        depositInfo.count += 1;
+                        depositInfo.total += Number(tx.amount || 0);
+                    }
+                });
+            }
+            return userData;
+        }
+
+        async function initiateCall() {
+            const email = document.getElementById("userEmail").value.trim().toLowerCase();
+            if (!email) return showToast("Enter your registered email.");
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast("Please enter a valid email.");
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            switchScreen(ui.email, ui.call);
+            ui.statusText.innerText = "Connecting...";
+            ui.pulse.parentElement.classList.remove("speaking");
+            ui.ringtone.volume = 0.5;
+            ui.ringtone.currentTime = 0;
+            ui.ringtone.play().catch(() => {});
+
+            let loadError = null;
+            const loadingSpeech = speakOnce("आपके खाते की जानकारी निकाली जा रही है, कृपया कॉल पर बने रहें।", "hi-IN");
+            const loadPromise = loadAccountData(email).catch(err => {
+                loadError = err;
+                return null;
+            });
+
+            await Promise.all([loadingSpeech, loadPromise]);
+            stopRingtone();
+
+            if (loadError) {
+                showToast(loadError.message || "Network error. Please try again.");
+                speakNativeVoice("माफ़ कीजिए, तकनीकी कारणों से आपके खाते की जानकारी नहीं मिल सकी। कृपया अपना ईमेल चेक करके दोबारा प्रयास करें। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।", "HANGUP", "hi-IN");
+                return;
+            }
+
+            // PHASE 0: Language Selection Request
+            const langSelectText = "Battletruth सपोर्ट में आपका स्वागत है। हिंदी में बात करने के लिए, एक दबाएं। For English, press 2.";
+            speakNativeVoice(langSelectText, "LANGUAGE_SELECTION", "hi-IN");
+        }
+
+        function speakOnce(text, langCode) {
+            return new Promise(resolve => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = langCode;
+                utterance.rate = 0.9;
+                utterance.onend = resolve;
+                utterance.onerror = resolve;
+                currentUtterance = utterance;
+                window.speechSynthesis.speak(utterance);
+            });
+        }
+
+        // BILINGUAL NATIVE VOICE HANDLER
+        function speakNativeVoice(text, nextState, forceLang = null) {
+            clearTimeout(inactivityTimer);
+            currentState = nextState;
+            window.speechSynthesis.cancel();
+            ui.statusText.innerText = "Agent Speaking...";
+            ui.pulse.parentElement.classList.add("speaking");
+            isInterrupting = false;
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = forceLang || currentLang;
+            // Native English flows better at rate 1.0, Hindi at 0.9
+            currentUtterance.rate = currentUtterance.lang === 'en-IN' ? 1.0 : 0.9; 
+            currentUtterance.onend = () => {
+                if (isInterrupting) return;
+                handleSpeechEnd(nextState);
+            };
+            currentUtterance.onerror = (e) => {
+                if (isInterrupting || e.error === "interrupted" || e.error === "canceled") return;
+                handleSpeechEnd(nextState);
+            };
+            window.speechSynthesis.speak(currentUtterance);
+        }
+
+        function handleSpeechEnd(nextState) {
+            ui.pulse.parentElement.classList.remove("speaking");
+            ui.statusText.innerText = "Listening for keypad...";
+            currentState = nextState;
+
+            if (nextState === "HANGUP") return endCall(false);
+            if (nextState === "OPEN_OTHER_ISSUE") {
+                endCall(false, true);
+                switchScreen(ui.call, ui.other);
+                return;
+            }
+            if (nextState === "CALL_ENDED") {
+                inactivityTimer = setTimeout(() => endCall(false), 1500);
+                return;
+            }
+
+            inactivityTimer = setTimeout(() => {
+                const noResp = currentLang === 'hi-IN' 
+                    ? "आपकी तरफ से कोई प्रतिक्रिया नहीं मिली। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।"
+                    : "No response was received from your side. Thank you for connecting with the Battletruth support team.";
+                speakNativeVoice(noResp, "HANGUP");
+            }, 12000);
+        }
+
+        function checkEligibility() {
+            if (Number(userData?.balance || 0) < 5) return "LOW_COINS";
+            if (depositInfo.count < 1) return "NO_DEPOSIT";
+            return "ELIGIBLE";
+        }
+
+        function eligibilityText() {
+            const eligibility = checkEligibility();
+            if (eligibility === "LOW_COINS") return "Not eligible - Account balance is below 5 coins.";
+            if (eligibility === "NO_DEPOSIT") return "Not eligible - No successful deposit record found.";
+            return "Eligible - Balance is >= 5 coins and successful deposit record exists.";
+        }
+
+        // ORIGINAL STATUS LOGIC, JUST RETURNING BILINGUAL STRINGS
+        function accountSummary() {
+            const status = String(userData?.status ?? "unknown");
+            
+            if (currentLang === 'hi-IN') {
+                const statusText = status.toLowerCase() === "active" ? "एक्टिव"
+                    : status.toLowerCase() === "inactive" ? "इनएक्टिव" : status;
+                return `आपका यूज़रनेम ${userData.username || "उपलब्ध नहीं"} है। आपके खाते का स्टेटस ${statusText} है। आपके वॉलेट में ${Number(userData.balance || 0)} कॉइन हैं। आपके द्वारा जमा की गई कुल सफल राशि ${depositInfo.total.toFixed(2)} रुपये है, और कुल सफल ट्रांज़ैक्शन ${depositInfo.count} हैं।`;
+            } else {
+                return `Your username is ${userData.username || "not available"}. Your account status is ${status}. You have ${Number(userData.balance || 0)} coins in your wallet. Your total successful deposits amount to ${depositInfo.total.toFixed(2)} rupees, with ${depositInfo.count} successful deposit transactions.`;
+            }
+        }
+
+        function handleKeypad(digit) {
+            if (navigator.vibrate) navigator.vibrate(50);
+            isInterrupting = true;
+            clearTimeout(inactivityTimer);
+            window.speechSynthesis.cancel();
+            ui.pulse.parentElement.classList.remove("speaking");
+            setTimeout(() => processKeypadLogic(String(digit)), 50);
+        }
+
+        function processKeypadLogic(digit) {
+            
+            // PHASE 0: LANGUAGE SELECTION
+            if (currentState === "LANGUAGE_SELECTION") {
+                if (digit === "1") {
+                    currentLang = 'hi-IN';
+                    speakNativeVoice("Battletruth सपोर्ट टीम में आपका स्वागत है। अपने खाते की जानकारी के लिए एक दबाएं। रिफंड और सेटलमेंट के लिए दो दबाएं। अपने withdrawal का स्टेटस जानने के लिए तीन दबाएं। किसी अन्य समस्या के लिए चार दबाएं।", "MAIN_MENU");
+                } else if (digit === "2") {
+                    currentLang = 'en-IN';
+                    speakNativeVoice("Welcome to the Battletruth support team. For account status and details, press 1. For refund and settlement, press 2. To check your withdrawal status, press 3. For any other issue, press 4.", "MAIN_MENU");
+                } else {
+                    speakNativeVoice("कृपया सही विकल्प चुनें। हिंदी में बात करने के लिए, एक दबाएं। For English, press 2.", "LANGUAGE_SELECTION", "hi-IN");
+                }
+                return;
+            }
+
+            if (currentState === "MAIN_MENU") {
+                if (digit === "1") {
+                    const eligibility = checkEligibility();
+                    let msg = accountSummary() + " ";
+                    if (currentLang === 'hi-IN') {
+                        if (eligibility === "ELIGIBLE") msg += "हमारे नियमों के अनुसार, आप रिफंड या सेटलमेंट प्राप्त करने के योग्य हैं। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।";
+                        else if (eligibility === "LOW_COINS") msg += "हमारे रिकॉर्ड के अनुसार, आप इसके लिए योग्य नहीं हैं, क्योंकि आपके खाते में पांच कॉइन से कम हैं। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।";
+                        else msg += "हमारे रिकॉर्ड के अनुसार, आप इसके लिए योग्य नहीं हैं, क्योंकि आपके खाते में पैसे जमा करने का कोई सफल रिकॉर्ड नहीं मिला। केवल वास्तविक रूप से जमा किए गए पैसे ही गिने जाते हैं। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।";
+                    } else {
+                        if (eligibility === "ELIGIBLE") msg += "Based on current rules, you pass the eligibility check for a refund or settlement. Thank you for connecting with the Battletruth support team.";
+                        else if (eligibility === "LOW_COINS") msg += "You are not eligible, because your account has less than five coins. Thank you for connecting with the Battletruth support team.";
+                        else msg += "You are not eligible, because no successful deposit record was found in your account. Thank you for connecting with the Battletruth support team.";
+                    }
+                    speakNativeVoice(msg, "HANGUP");
+                } 
+                else if (digit === "2") {
+                    requestIntent = "Refund / Settlement";
+                    const eligibility = checkEligibility();
+                    if (currentLang === 'hi-IN') {
+                        if (eligibility === "ELIGIBLE") {
+                            speakNativeVoice(`हमारे रिकॉर्ड के अनुसार, आपके खाते में ${Number(userData.balance || 0)} कॉइन हैं और कुल सफल जमा राशि ${depositInfo.total.toFixed(2)} रुपये है। आप प्रारंभिक नियमों पर खरे उतरते हैं। यदि आप रिफंड या सेटलमेंट के लिए हमारी सपोर्ट टीम से बात करना चाहते हैं, तो तीन दबाएं।`, "WAIT_REFUND_CONFIRM");
+                        } else if (eligibility === "LOW_COINS") {
+                            speakNativeVoice("हमारे रिकॉर्ड के अनुसार, आप रिफंड के लिए योग्य नहीं हैं, क्योंकि आपका अकाउंट बैलेंस पांच कॉइन से कम है। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।", "HANGUP");
+                        } else {
+                            speakNativeVoice("हमारे रिकॉर्ड के अनुसार, आप रिफंड के लिए योग्य नहीं हैं, क्योंकि हमें पैसे जमा करने का कोई सफल रिकॉर्ड नहीं मिला। डेली स्पिन, लॉगिन इनाम या अन्य मुफ्त क्रेडिट्स इसमें नहीं गिने जाते। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।", "HANGUP");
+                        }
+                    } else {
+                        if (eligibility === "ELIGIBLE") {
+                            speakNativeVoice(`Your account has ${Number(userData.balance || 0)} coins and total successful deposits of ${depositInfo.total.toFixed(2)} rupees. You pass the initial eligibility check. If you want to talk to the support team for refund and settlement, press 3.`, "WAIT_REFUND_CONFIRM");
+                        } else if (eligibility === "LOW_COINS") {
+                            speakNativeVoice("You are not eligible for a refund, because your account balance is less than five coins. Thank you for connecting with the Battletruth support team.", "HANGUP");
+                        } else {
+                            speakNativeVoice("You are not eligible for a refund, because no successful deposit record was found. Thank you for connecting with the Battletruth support team.", "HANGUP");
+                        }
+                    }
+                } 
+                else if (digit === "3") {
+                    lookupWithdrawalStatus();
+                } 
+                else if (digit === "4") {
+                    const txt = currentLang === 'hi-IN' ? "अपनी अन्य समस्या हमारी सपोर्ट टीम को बताने के लिए, तीन दबाएं।" : "To forward your other issue to the support team, press 3.";
+                    speakNativeVoice(txt, "WAIT_OTHER_CONFIRM");
+                } 
+                else {
+                    const errTxt = currentLang === 'hi-IN' ? "कृपया सही विकल्प चुनें। खाते की जानकारी के लिए एक, रिफंड के लिए दो, withdrawal स्टेटस के लिए तीन, या अन्य समस्या के लिए चार दबाएं।" : "Please choose a valid option. Press 1 for account status, 2 for refund, 3 for withdrawal status, or 4 for any other issue.";
+                    speakNativeVoice(errTxt, "MAIN_MENU");
+                }
+                return;
+            }
+
+            if (currentState === "WAIT_REFUND_CONFIRM") {
+                if (digit === "3") {
+                    redirectToWhatsApp("Refund / Settlement Request");
+                } else {
+                    const txt = currentLang === 'hi-IN' ? "अपने रिफंड या सेटलमेंट के अनुरोध को आगे बढ़ाने के लिए, केवल तीन दबाएं।" : "Press 3 only to continue with your refund and settlement request.";
+                    speakNativeVoice(txt, "WAIT_REFUND_CONFIRM");
+                }
+                return;
+            }
+
+            if (currentState === "WAIT_OTHER_CONFIRM") {
+                if (digit === "3") {
+                    const txt = currentLang === 'hi-IN' ? "कृपया स्क्रीन पर अपनी समस्या लिखकर सबमिट करें।" : "Please type your problem on the screen and submit.";
+                    speakNativeVoice(txt, "OPEN_OTHER_ISSUE");
+                } else {
+                    const txt = currentLang === 'hi-IN' ? "सपोर्ट टीम से जुड़ने के लिए तीन दबाएं।" : "Press 3 to connect with the support team.";
+                    speakNativeVoice(txt, "WAIT_OTHER_CONFIRM");
+                }
+                return;
+            }
+
+            // RE-WITHDRAWAL CHECK OPTION
+            if (currentState === "WAIT_NEW_WITHDRAWAL_CONFIRM") {
+                if (digit === "5") {
+                    redirectToWhatsApp("New Withdrawal Request");
+                } else {
+                    const txt = currentLang === 'hi-IN' ? "नया withdrawal request करने के लिए, पांच दबाएं।" : "Press 5 to place a new withdrawal request.";
+                    speakNativeVoice(txt, "WAIT_NEW_WITHDRAWAL_CONFIRM");
+                }
+                return;
+            }
+
+            const inv = currentLang === 'hi-IN' ? "इस विकल्प के लिए कॉल आगे नहीं बढ़ाई जा सकती। कृपया दोबारा कॉल करें। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।" : "The call cannot proceed for this option. Please call again. Thank you for connecting with the Battletruth support team.";
+            speakNativeVoice(inv, "HANGUP");
+        }
+
+        async function lookupWithdrawalStatus() {
+            currentState = "LOOKUP_WITHDRAWAL";
+            ui.statusText.innerText = "Checking withdrawal...";
+            try {
+                // UNTOUCHED ORIGINAL QUERY LOGIC
+                const withdrawalQuery = query(ref(db, "withdrawals"), orderByChild("uid"), equalTo(accountUid));
+                const snap = await get(withdrawalQuery);
+                const requests = [];
+                
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        requests.push({ key: child.key, ...child.val() });
+                    });
+                }
+                
+                requests.sort((a, b) => {
+                    const ta = Date.parse(a.date || "") || 0;
+                    const tb = Date.parse(b.date || "") || 0;
+                    return tb - ta;
+                });
+
+                let speechText = "";
+                let finalState = "HANGUP";
+
+                if (!requests.length) {
+                    speechText = currentLang === 'hi-IN' ? "हमारे रिकॉर्ड के अनुसार, आपके खाते में कोई withdrawal request नहीं मिली है।" : "No withdrawal request record was found for your account.";
+                } else {
+                    const latest = requests[0];
+                    const rawStatus = String(latest.status || "unknown").toLowerCase();
+                    const amount = Number(latest.amount || 0);
+                    
+                    if (currentLang === 'hi-IN') {
+                        let statusHindi;
+                        if (rawStatus === "pending") statusHindi = "pending है, जिसे अभी प्रोसेस किया जाना बाकी है";
+                        else if (rawStatus === "completed" || rawStatus === "complete" || rawStatus === "success") statusHindi = "सफलतापूर्वक complete हो चुकी है";
+                        else if (rawStatus === "rejected" || rawStatus === "failed") statusHindi = "reject कर दी गई है";
+                        else statusHindi = `वर्तमान में ${rawStatus} है`;
+                        speechText = `आपकी latest withdrawal request की राशि ${amount} रुपये है और यह ${statusHindi}। यह जानकारी हमारे नवीनतम रिकॉर्ड के अनुसार है।`;
+                    } else {
+                        let statusEng;
+                        if (rawStatus === "pending") statusEng = "is pending and yet to be processed";
+                        else if (rawStatus === "completed" || rawStatus === "complete" || rawStatus === "success") statusEng = "is completed";
+                        else if (rawStatus === "rejected" || rawStatus === "failed") statusEng = "has been rejected";
+                        else statusEng = `status is ${rawStatus}`;
+                        speechText = `Your latest withdrawal request is for ${amount} rupees and its ${statusEng}. This is according to the latest database record.`;
+                    }
+                }
+
+                // RE-WITHDRAWAL LOGIC: Option available if Deposit > 10 and Balance >= 10
+                if (depositInfo.total > 10 && Number(userData.balance || 0) >= 10) {
+                    if (currentLang === 'hi-IN') {
+                        speechText += " हमारे नियमों के अनुसार, आप एक नया withdrawal करने के लिए भी योग्य हैं। नया withdrawal request करने के लिए, पांच दबाएं।";
+                    } else {
+                        speechText += " You are also eligible to place a new withdrawal. Press 5 to place a new withdrawal request.";
+                    }
+                    finalState = "WAIT_NEW_WITHDRAWAL_CONFIRM";
+                } else {
+                    if (currentLang === 'hi-IN') {
+                        speechText += " Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।";
+                    } else {
+                        speechText += " Thank you for connecting with the Battletruth support team.";
+                    }
+                }
+
+                speakNativeVoice(speechText, finalState);
+
+            } catch (err) {
+                const failTxt = currentLang === 'hi-IN' ? "माफ़ कीजिए, तकनीकी कारणों से अभी आपके withdrawal का स्टेटस चेक नहीं हो सका। कृपया कुछ देर बाद दोबारा प्रयास करें। Battletruth सपोर्ट टीम से जुड़ने के लिए धन्यवाद।" : "Sorry, the withdrawal status could not be checked from the database right now. Please try again later. Thank you for connecting with the Battletruth support team.";
+                speakNativeVoice(failTxt, "HANGUP");
+            }
+        }
+
+        function endCall(isManual = false, keepAppOpen = false) {
+            stopRingtone();
+            isInterrupting = true;
+            window.speechSynthesis.cancel();
+            clearTimeout(inactivityTimer);
+            currentState = "INIT";
+            ui.pulse.parentElement.classList.remove("speaking");
+            if (!keepAppOpen) {
+                setTimeout(() => {
+                    ui.call.classList.remove("active", "slide-out-left");
+                    ui.call.classList.add("waiting-right");
+                    
+                    ui.other.classList.remove("active", "slide-out-left");
+                    ui.other.classList.add("waiting-right");
+                    
+                    ui.email.classList.remove("slide-out-left", "waiting-right");
+                    ui.email.classList.add("active");
+                    
+                    document.getElementById("userEmail").value = "";
+                }, isManual ? 0 : 1500);
+            }
+        }
+
+        function redirectToWhatsApp(intent) {
+            endCall(false, true);
+            switchScreen(ui.call, ui.success);
+            const message = `Hello Support Team,\n\n*Request Type:* ${intent}\n*Account Name:* ${userData.username || "Not available"}\n*Account ID:* ${accountUid}\n*Registered Email:* ${userData.email || ""}\n*Account Status:* ${userData.status || "Unknown"}\n*Coin Balance:* ${Number(userData.balance || 0)}\n*Successful Deposit Transactions:* ${depositInfo.count}\n*Total Successful Deposits:* ₹${depositInfo.total.toFixed(2)}\n*Eligibility:* ${eligibilityText()}\n\nPlease review my account and guide me through the applicable process. Thank you.`;
+            const waUrl = `https://wa.me/${SUPPORT_NUMBER}?text=${encodeURIComponent(message)}`;
+            setTimeout(() => { window.location.href = waUrl; }, 1200);
+        }
+
+        function submitOtherIssue() {
+            const issue = document.getElementById("customIssueText").value.trim();
+            if (!issue) return showToast("Please type your problem.");
+            switchScreen(ui.other, ui.success);
+            const message = `Hello Support Team,\n\n*Request Type:* Other Support Issue\n*Account Name:* ${userData.username || "Not available"}\n*Account ID:* ${accountUid}\n*Registered Email:* ${userData.email || ""}\n*Account Status:* ${userData.status || "Unknown"}\n*Coin Balance:* ${Number(userData.balance || 0)}\n*Successful Deposit Transactions:* ${depositInfo.count}\n*Total Successful Deposits:* ₹${depositInfo.total.toFixed(2)}\n\n*My Issue:*\n${issue}\n\nPlease help me resolve this. Thank you.`;
+            const waUrl = `https://wa.me/${SUPPORT_NUMBER}?text=${encodeURIComponent(message)}`;
+            setTimeout(() => { window.location.href = waUrl; }, 1200);
+        }
+    </script>
 </body>
 </html>
